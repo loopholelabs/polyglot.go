@@ -3,7 +3,7 @@ module github.com/loopholelabs/polyglot/v2
 go 1.21.4
 
 require (
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	google.golang.org/protobuf v1.35.1
 )
 
