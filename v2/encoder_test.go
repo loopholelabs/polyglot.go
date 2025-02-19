@@ -17,6 +17,8 @@
 package polyglot
 
 import (
+	"strings"
+
 	"github.com/stretchr/testify/assert"
 
 	"errors"
@@ -130,6 +132,52 @@ func TestEncoderString(t *testing.T) {
 	p.Reset()
 	n := testing.AllocsPerRun(100, func() {
 		Encoder(p).String(v)
+		p.Reset()
+	})
+	assert.Zero(t, n)
+}
+
+func TestEncoderStringLong(t *testing.T) {
+	t.Parallel()
+
+	p := NewBuffer()
+	b := strings.Builder{}
+	for i := 0; i < 1000; i++ {
+		b.WriteString("a")
+	}
+	v := b.String()
+	e := []byte(v)
+
+	Encoder(p).String(v)
+
+	assert.Equal(t, 1+1+1+1+len(e), len(p.Bytes()))
+	assert.Equal(t, e, (p.Bytes())[1+1+1+1:])
+
+	p.Reset()
+	n := testing.AllocsPerRun(100, func() {
+		Encoder(p).String(v)
+		p.Reset()
+	})
+	assert.Zero(t, n)
+}
+
+func TestEncoderStringMultiple(t *testing.T) {
+	t.Parallel()
+
+	p := NewBuffer()
+	b := strings.Builder{}
+	en := Encoder(p)
+
+	for i := 0; i < 1000; i++ {
+		b.WriteString("a")
+		en = en.String("a")
+	}
+
+	assert.Equal(t, 4*b.Len(), len(p.Bytes()))
+
+	p.Reset()
+	n := testing.AllocsPerRun(100, func() {
+		Encoder(p).String(b.String())
 		p.Reset()
 	})
 	assert.Zero(t, n)

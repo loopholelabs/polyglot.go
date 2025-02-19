@@ -61,6 +61,8 @@ func (buf *Buffer) Grow(n int) {
 		} else {
 			buf.b = append(buf.b[:buf.offset], make([]byte, cap(buf.b)*2-buf.offset)...)
 		}
+		// Grow buffer length to match its new capacity.
+		buf.b = buf.b[:cap(buf.b)]
 	}
 }
 
